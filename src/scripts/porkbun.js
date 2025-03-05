@@ -13,14 +13,17 @@
   //   }
   // });
   
-  // Toast management functions
+  // Toast management functions with progress bar
   const Toast = (() => {
     let toastElem = null;
+    let progressBar = null;
+    let toastText = null;
     let hideTimeout = null;
     let maxValue = 0;
 
     function createToast() {
       if (!toastElem) {
+        // Toast container
         toastElem = document.createElement('div');
         toastElem.style.position = 'fixed';
         toastElem.style.bottom = '10px';
@@ -32,6 +35,30 @@
         toastElem.style.fontSize = '12px';
         toastElem.style.zIndex = '999999';
         toastElem.style.fontFamily = 'Arial, sans-serif';
+        toastElem.style.minWidth = '150px';
+        toastElem.style.textAlign = 'center';
+
+        // Text element
+        toastText = document.createElement('div');
+        toastElem.appendChild(toastText);
+
+        // Progress bar container
+        const progressContainer = document.createElement('div');
+        progressContainer.style.width = '100%';
+        progressContainer.style.height = '4px';
+        progressContainer.style.backgroundColor = 'rgba(255,255,255,0.3)';
+        progressContainer.style.borderRadius = '2px';
+        progressContainer.style.marginTop = '6px';
+        toastElem.appendChild(progressContainer);
+
+        // Progress bar itself
+        progressBar = document.createElement('div');
+        progressBar.style.width = '100%';
+        progressBar.style.height = '100%';
+        progressBar.style.backgroundColor = '#4caf50';
+        progressBar.style.borderRadius = '2px';
+        progressContainer.appendChild(progressBar);
+
         document.body.appendChild(toastElem);
       }
     }
@@ -42,11 +69,18 @@
         maxValue = currentValue;
       }
       if (currentValue > 0) {
-        toastElem.textContent = `Waiting for ${currentValue}/${maxValue} domains to resolve`;
+        toastText.textContent = `Waiting for ${currentValue}/${maxValue} domains to resolve`;
+        const progressPercent = ((maxValue - currentValue) / maxValue) * 100;
+        progressBar.style.width = `${progressPercent}%`;
         clearTimeout(hideTimeout);
       } else {
-        toastElem.textContent = 'Porkbun clean complete';
+        toastText.textContent = 'Porkbun cleanup complete!';
+        progressBar.style.width = '100%';
         clearTimeout(hideTimeout);
+
+        // delete progressBarContainer
+        progressContainer.remove();
+
         hideTimeout = setTimeout(removeToast, 5000);
         maxValue = 0; // reset for next use
       }
@@ -56,6 +90,8 @@
       if (toastElem) {
         toastElem.remove();
         toastElem = null;
+        progressBar = null;
+        toastText = null;
       }
     }
 
