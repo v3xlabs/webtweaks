@@ -20,6 +20,7 @@
     let toastText = null;
     let hideTimeout = null;
     let maxValue = 0;
+    let progressContainer = null;
 
     function createToast() {
       if (!toastElem) {
@@ -43,7 +44,7 @@
         toastElem.appendChild(toastText);
 
         // Progress bar container
-        const progressContainer = document.createElement('div');
+        progressContainer = document.createElement('div');
         progressContainer.style.width = '100%';
         progressContainer.style.height = '4px';
         progressContainer.style.backgroundColor = 'rgba(255,255,255,0.3)';
@@ -79,7 +80,7 @@
         clearTimeout(hideTimeout);
 
         // delete progressBarContainer
-        progressContainer.remove();
+        progressContainer?.remove();
 
         hideTimeout = setTimeout(removeToast, 5000);
         maxValue = 0; // reset for next use
