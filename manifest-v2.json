@@ -1,0 +1,50 @@
+{
+    "manifest_version": 2,
+    "name": "WebTweaks",
+    "version": "1.0.0",
+    "description": "Various web page tweaks for better browsing experience",
+    "author": "V3X Labs (v3xlabs)",
+    "icons": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+    },
+    "browser_action": {
+        "default_popup": "popup/popup.html",
+        "default_icon": {
+            "16": "icons/icon16.png",
+            "48": "icons/icon48.png",
+            "128": "icons/icon128.png"
+        }
+    },
+    "background": {
+        "scripts": ["background.js"]
+    },
+    "permissions": [
+        "activeTab",
+        "scripting",
+        "storage",
+        "https://porkbun.com/*"
+    ],
+    "commands": {
+        "_execute_browser_action": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+W",
+                "mac": "Command+Shift+W"
+            },
+            "description": "Open WebTweaks popup"
+        }
+    },
+    "content_scripts": [
+        {
+            "matches": ["https://porkbun.com/checkout/search?q=*"],
+            "js": ["scripts/porkbun.js"],
+            "run_at": "document_idle"
+        }
+    ],
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "webtweaks@v3x.company"
+        }
+    }
+} 

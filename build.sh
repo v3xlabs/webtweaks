@@ -35,12 +35,7 @@ build_firefox() {
     mkdir -p "$target_dir"
 
     copy_common_files "$target_dir"
-
-    # Create Firefox-specific manifest
-    jq '.manifest_version = 2 | 
-        .background = {"scripts": ["background.js"]} | 
-        .browser_specific_settings = {"gecko": {"id": "webtweaks@v3x.company"}}' \
-        manifest.json >"$target_dir/manifest.json"
+    cp manifest-v2.json "$target_dir/manifest.json"
 
     # Build XPI using web-ext
     npx web-ext build --source-dir "$target_dir" --artifacts-dir "./dist" --filename webtweaks-firefox.xpi --overwrite-dest
