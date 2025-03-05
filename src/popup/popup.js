@@ -1,6 +1,8 @@
+const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
+
 document.addEventListener('DOMContentLoaded', async function() {
   // Load current settings
-  const result = await browser.storage.sync.get('settings');
+  const result = await browserAPI.storage.sync.get('settings');
   const settings = result.settings || {};
   
   // Set toggle states based on stored settings
@@ -10,7 +12,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     // Add event listener for toggle changes
     porkbunToggle.addEventListener('change', function() {
-      browser.runtime.sendMessage({
+      browserAPI.runtime.sendMessage({
         action: 'updateSetting',
         setting: 'porkbunCleanView',
         value: this.checked
@@ -22,13 +24,13 @@ document.addEventListener('DOMContentLoaded', async function() {
   const porkbunCleanBtn = document.getElementById('porkbunCleanBtn');
   if (porkbunCleanBtn) {
     porkbunCleanBtn.addEventListener('click', async function() {
-      const tabs = await browser.tabs.query({active: true, currentWindow: true});
+      const tabs = await browserAPI.tabs.query({active: true, currentWindow: true});
       const currentTab = tabs[0];
       const url = new URL(currentTab.url);
       
       if (url.hostname === 'porkbun.com' && url.pathname.includes('/checkout/search')) {
         // Send message to background script instead of directly to tab
-        browser.runtime.sendMessage({
+        browserAPI.runtime.sendMessage({
           action: 'triggerScript',
           script: 'porkbunCleanView'
         });
@@ -44,3 +46,4 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
   }
 });
+
