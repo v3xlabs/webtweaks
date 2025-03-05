@@ -1,0 +1,55 @@
+name: Build and Release WebTweaks
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          
+      - name: Install dependencies
+        run: |
+          npm install -g crx
+          
+      - name: Create private key from secret
+        run: |
+          mkdir -p .build
+          echo "${{ secrets.CRX_PRIVATE_KEY }}" > .build/key.pem
+          
+      - name: Package Extension
+        run: |
+          # Create CRX file for direct install
+          crx pack . -o .build/webtweaks.crx -p .build/key.pem
+          
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: WebTweaks ${{ github.ref }}
+          draft: false
+          prerelease: false
+          
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: .build/webtweaks.crx
+          asset_name: webtweaks.crx
+          asset_content_type: application/x-chrome-extension

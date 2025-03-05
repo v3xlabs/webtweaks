@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128" height="128" viewBox="0 0 128 128" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background circle -->
+    <circle cx="64" cy="64" r="60" fill="#4285f4"/>
+    
+    <!-- Simple "W" letter in the middle -->
+    <path d="M 30,40 
+             L 45,88 
+             L 64,50 
+             L 83,88 
+             L 98,40 
+             L 85,40 
+             L 64,88 
+             L 43,40 
+             Z" 
+          fill="white"/>
+</svg>
