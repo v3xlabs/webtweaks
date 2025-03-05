@@ -1,9 +1,14 @@
+const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
+
+console.log('WebTweaks: Background script loaded');
+
 // Background script to handle keyboard shortcuts and messaging
-chrome.runtime.onInstalled.addListener(() => {
+browserAPI.runtime.onInstalled.addListener(() => {
   // Initialize extension settings
-  chrome.storage.sync.get(['settings'], (result) => {
+  browserAPI.storage.sync.get(['settings'], (result) => {
     if (!result.settings) {
-      chrome.storage.sync.set({
+      console.log('WebTweaks: No settings found, creating default settings');
+      browserAPI.storage.sync.set({
         settings: {
           porkbunCleanView: true,
           // Add other settings here as needed
@@ -14,15 +19,19 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 // Handle messages from popup
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log('WebTweaks: Received message:', message);
   if (message.action === "triggerScript") {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    console.log('WebTweaks: Triggering script:', message.script);
+    browserAPI.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const activeTab = tabs[0];
       
+      console.log('WebTweaks: Active tab:', activeTab);
       if (message.script === "porkbunCleanView") {
-        chrome.scripting.executeScript({
+        console.log('WebTweaks: Executing Porkbun clean view');
+        browserAPI.scripting.executeScript({
           target: { tabId: activeTab.id },
-          function: executePorkbunCleanView
+          files: ['scripts/porkbun.js']
         });
       }
       // Add other script triggers as needed
@@ -37,15 +46,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 function updateSetting(settingName, value) {
-  chrome.storage.sync.get(['settings'], (result) => {
+  browserAPI.storage.sync.get(['settings'], (result) => {
     const settings = result.settings || {};
     settings[settingName] = value;
-    chrome.storage.sync.set({ settings });
+    browserAPI.storage.sync.set({ settings });
   });
-}
-
-function executePorkbunCleanView() {
-  // Will be replaced by the actual function in content script
-  // This is just a placeholder for the executeScript API
-  console.log("Porkbun clean view executed");
 }

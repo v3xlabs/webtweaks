@@ -1,24 +1,21 @@
 // Porkbun Clean View script
 (() => {
-  const settings = { enabled: true }; // Default setting
+  console.log('WebTweaks: Porkbun script loaded');
+
+  // Get the browser API namespace
+  const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
   
-  // First, check if the feature is enabled
-  chrome.storage.sync.get(['settings'], (result) => {
-    if (result.settings && result.settings.porkbunCleanView === false) {
-      settings.enabled = false;
-    }
-    
-    // Listen for manual triggers from the popup
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      if (message.action === "triggerPorkbunCleanView") {
-        cleanPorkbunView();
-        sendResponse({ success: true });
-      }
-    });
-  });
+  // Listen for manual triggers from the popup
+  // browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  //   if (message.action === "triggerPorkbunCleanView") {
+  //     cleanPorkbunView();
+  //     sendResponse({ success: true });
+  //   }
+  // });
   
   // Function to clean up Porkbun search results
   function cleanPorkbunView() {
+    console.log('WebTweaks: Cleaning Porkbun view');
     // Click the button
     const myButton = document.querySelector('#mybutton');
     if (myButton) {
@@ -40,12 +37,6 @@
     
     console.log('WebTweaks: Porkbun clean view applied');
   }
-  
-  // Run automatically if enabled
-  if (settings.enabled) {
-    // Wait for page to fully load
-    window.addEventListener('load', () => {
-      setTimeout(cleanPorkbunView, 1000);
-    });
-  }
+
+  cleanPorkbunView();
 })();
