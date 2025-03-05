@@ -1,55 +1,52 @@
-name: Build and Release WebTweaks
+name: Build Extension
 
 on:
   push:
-    tags:
-      - 'v*'
-  workflow_dispatch:
+    branches: [ master ]
+  release:
+    types: [ created ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
         
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-          
-      - name: Install dependencies
-        run: |
-          npm install -g crx
-          
-      - name: Create private key from secret
-        run: |
-          mkdir -p .build
-          echo "${{ secrets.CRX_PRIVATE_KEY }}" > .build/key.pem
-          
-      - name: Package Extension
-        run: |
-          # Create CRX file for direct install
-          crx pack . -o .build/webtweaks.crx -p .build/key.pem
-          
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: WebTweaks ${{ github.ref }}
-          draft: false
-          prerelease: false
-          
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: .build/webtweaks.crx
-          asset_name: webtweaks.crx
-          asset_content_type: application/x-chrome-extension
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Build extensions
+      run: npm run build
+      
+    - name: Upload Chrome artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: chrome-extension
+        path: dist/webtweaks-chrome.zip
+        
+    - name: Upload Firefox artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: firefox-extension
+        path: dist/webtweaks-firefox.xpi
+        
+    - name: Upload unpacked extensions
+      uses: actions/upload-artifact@v4
+      with:
+        name: unpacked-extensions
+        path: dist/unpacked/
+        
+    - name: Release assets
+      if: github.event_name == 'release'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release upload ${{ github.event.release.tag_name }} \
+          dist/webtweaks-chrome.zip \
+          dist/webtweaks-firefox.xpi

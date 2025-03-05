@@ -1,0 +1,15 @@
+{
+    "name": "webtweaks",
+    "version": "1.0.0",
+    "description": "Various web page tweaks for better browsing experience",
+    "scripts": {
+        "build": "bash ./build.sh",
+        "build:chrome": "bash ./build.sh chrome",
+        "build:firefox": "bash ./build.sh firefox",
+        "clean": "rm -rf dist/"
+    },
+    "devDependencies": {
+        "web-ext": "^7.11.0"
+    },
+    "private": true
+}
